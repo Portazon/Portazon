@@ -12,7 +12,7 @@ class HomePage extends React.Component {
     return(
       <div>
         <Header></Header>
-        <div>HomePage main Content</div>
+        <div className='container-fluid bg'></div>
         <Footer></Footer>
       </div>
     );
