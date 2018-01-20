@@ -58,8 +58,12 @@
   padding: 40px 20px;
   color: white;
 }
-
-
+.bg {
+  height: 100%;
+  background-image: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGkRcDCuTrExq6HcYtWD-FRAxTH6n71xWDJuAGNI-BxT1MoGtNOA);
+  background-position: center center;
+  background-size: cover;
+}
 .text-right{
   text-align: right;
 }
@@ -71,3 +75,4 @@
 .text-center{
   text-align: center;
 }
+

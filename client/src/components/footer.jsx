@@ -25,14 +25,14 @@ class Footer extends React.Component {
             </div>
             <div className='col-xs-4 footer-section'>
               <h6>NEWSLETTER</h6>
-              <div class="input-group margin-bottom-sm col-xs-8 col-xs-offset-2 text-center">
-                <span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>
-                <input class="form-control" type="text" placeholder="Email address"/>
+              <div className="input-group margin-bottom-sm col-xs-8 col-xs-offset-2 text-center">
+                <span className="input-group-addon"><i className="fa fa-envelope-o fa-fw"></i></span>
+                <input className="form-control" type="text" placeholder="Email address"/>
               </div>
               </div>
             </div>
           <div className='col-xs-12 sub-footer'>
-          <i class="fa fa-copyright fa-lg" aria-hidden="true"></i>
+          <i className="fa fa-copyright fa-lg" aria-hidden="true"></i>
           <span>COPYRIGHT 2018 PORTAZON. ALL RIGHTS RESERVED</span>
           </div>
         </div>
