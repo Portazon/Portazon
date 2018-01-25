@@ -1,69 +1,62 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-<<<<<<< HEAD
-import ShoppingCart from './components/Shoppingcart.jsx';
+import Header from './components/header.jsx';
+import Footer from './components/footer.jsx';
 import HomePage from './components/homePage.jsx';
-import ProductsList from './components/productsListPage.jsx';
-=======
 import ShoppingCart from './components/shoppingCart.jsx';
-import HomePage from './components/homePage.jsx';
 import ProductsList from './components/productsListPage.jsx';
 import ProductCard from './components/productCard.jsx';
-import Header from './components/header.jsx';
+import ProductDetail from './components/productDetailPage.jsx';
+import CheckOut from './components/checkOut.jsx';
 
 var axios = require('axios');
->>>>>>> 6d93f95915e5c0dc974667cc85bc4a8d109794b5
 
 class Hello extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-<<<<<<< HEAD
-      view: 'productsList',
-      cart: []
-=======
-      view: 'homepage',
+      view: 'homePage',
       cart: null,
+      totalAmt: '',
       searchedItems: null,
-      query: ''
->>>>>>> 6d93f95915e5c0dc974667cc85bc4a8d109794b5
+      query: '',
+      productDetail: '',
+      userInvoice:''
     }
     this.changeView = this.changeView.bind(this);
     this.submitQuery = this.submitQuery.bind(this);
     this.addItemToCart = this.addItemToCart.bind(this);
   }
 
-  changeView(view){
-    this.setState({view: view});
+  changeView(view, item, invoice){
+    this.setState({view: view, productDetail: item, userInvoice: invoice});
   }
 
   submitQuery(query) {
     axios.get('search/?q=' + query)
       .then(res => {
-        // console.log('response', res.data)
+        console.log('response', res.data)
         let items = res.data;
-        let modItems = parseImageUrls(items);
-        console.log('modItems', modItems)
+        let noDupes = cutDuplicates(items);
+        let parseImages = parseImageUrls(noDupes);
+
+        console.log('modItems', parseImages)
         if (this.state.view !== 'productsList') {
-          this.setState({searchedItems: modItems, query: query, view: 'productsList'})
+          this.setState({searchedItems: parseImages, query: query, view: 'productsList'})
         } else {
-          this.setState({searchedItems: modItems, query: query});
-          //even though I set the state, it isn't updating the product list component?! what the heck!?
+          this.setState({searchedItems: parseImages, query: query});
         }
       })
     }
 
   addItemToCart(item) {
-    console.log('in add item to cart', item)
     let cart = this.state.cart;
     item.quantity = 1;
     if (!cart) {
       this.setState({cart: [item]})
     } else {
-      console.log('cart to be pushed', cart)
       let update = cart.push(item);
-      // console.log('updated', update)
       this.setState({cart: cart});
     }
   }
@@ -90,22 +83,29 @@ class Hello extends React.Component {
 
   renderView() {
     let view = this.state.view;
-    if (view === 'homepage') {
+    if (view === 'homePage') {
       return <HomePage changeView={this.changeView} submitQuery={this.submitQuery}/>
     } else if (view === 'shoppingCart') {
-      return <ShoppingCart cart={this.state.cart}/>
+      return <ShoppingCart
+        cart={this.state.cart}
+        changeView={this.changeView}
+        />
     }  else if (view === 'productsList') {
-<<<<<<< HEAD
-      return <ProductsList/>
-=======
       return <ProductsList
         products={this.state.searchedItems}
         query={this.state.query}
         addItemToCart={this.addItemToCart}
         submitQuery={this.submitQuery}
+        changeView={this.changeView}
         />
->>>>>>> 6d93f95915e5c0dc974667cc85bc4a8d109794b5
-    }else {
+    } else if(view === 'productDetail'){
+      return <ProductDetail
+        item={this.state.productDetail}
+        addItemToCart={this.addItemToCart}
+        />
+    } else if (view === 'checkOut'){
+        return <CheckOut />
+    } else {
       return null;
     }
   }
@@ -117,33 +117,36 @@ class Hello extends React.Component {
         <div>
           {this.renderView()}
         </div>
+        <Footer/>
       </div>
       );
   }
 }
 
-function addDecimalInPrice(number) {
-  let s = number.toString().split('');
-  let last = s[s.length - 1];
-  let sec = s[s.length - 2];
-  if (last === '9' && sec === '9') {
-    s.splice(2, 0, '.');
-    let n = s.join('');
-    return parseFloat(n);
-  }
-  return number;
-}
+
 
 function parseImageUrls(items) {
   for (let i = 0; i < items.length; i++) {
     let images = JSON.parse(items[i]._source.image);
     items[i]._source.image = images;
-    let retail = items[i]._source.retail_price;
-    items[i]._source.retail_price = addDecimalInPrice(retail);
-    let discount = items[i]._source.discounted_price;
-    items[i]._source.discounted_price = addDecimalInPrice(discount);
+    if (items[i]._source.discounted_price === null || !items[i]._source.retail_price === null) {
+      items.splice(i, 1);
+    }
   }
   return items;
+}
+
+function cutDuplicates(items) {
+  let list = [];
+  let newItemList = [];
+
+  for (let i = 0; i < items.length; i++) {
+    if (!list.includes(items[i]._source.product_name)) {
+      list.push(items[i]._source.product_name);
+      newItemList.push(items[i])
+    }
+  }
+  return newItemList;
 }
 
 ReactDOM.render(<Hello/>, document.getElementById('root'));

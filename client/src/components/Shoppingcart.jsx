@@ -1,5 +1,4 @@
 import React from 'react';
-import Footer from './Footer.jsx';
 
 class ShoppingCart extends React.Component {
   constructor(props) {
@@ -10,10 +9,16 @@ class ShoppingCart extends React.Component {
       totalItems: 0
     }
     this.changeQuantity = this.changeQuantity.bind(this);
+    this.handleCheckoutClick = this.handleCheckoutClick.bind(this);
   }
 
   componentDidMount(){
     this.getTotals();
+  }
+
+  handleCheckoutClick() {
+    console.log('in checkout click')
+    this.props.changeView('checkOut');
   }
 
   changeQuantity(e, item) {
@@ -65,7 +70,7 @@ class ShoppingCart extends React.Component {
 
   render() {
     return(
-      <div className="container-fluid">
+      <div className="shopping-cart container-fluid">
         <div>
           <h2>shopping cart</h2>
         </div>
@@ -73,39 +78,43 @@ class ShoppingCart extends React.Component {
           <h3>Your current total amount is: $ {this.state.totalAmt}</h3>
         </div>
         <div className="cart-item-banner col-sm-12">
-          <div className="col-sm-3">picture</div>
-          <div className="col-sm-3">name</div>
-          <div className="col-sm-2">price</div>
-          <div className="col-sm-2">quantity</div>
-          <div className="col-sm-2">total</div>
+          <h3 className="col-sm-3"></h3>
+          <h3 className="col-sm-3">name</h3>
+          <h3 className="col-sm-2">price</h3>
+          <h3 className="col-sm-2">quantity</h3>
+          <h3 className="col-sm-2">total</h3>
         </div>
         <div className="cart-items col-sm-12">
           {this.createItemList()}
         </div>
         <div className="cart-summary col-sm-12">
-          <div className="col-sm-7">
-          </div>
           <div className="col-sm-5">
+          </div>
+          <div className="col-sm-7">
             <div>
               <input placeholder="enter promo code here"/>
               <button>Apply</button>
             </div>
-            <div>
-              Subtotal ({this.state.totalItems} items): ${this.state.totalAmt}
+            <div className="cart-summary-row">
+              <h4> Subtotal ({this.state.totalItems} items):</h4>
+              <span> ${this.state.totalAmt}</span>
+            </div>
+            <div className="cart-summary-row">
+              <h4>Shipping & Handling:</h4>
+              <span>$0.00</span>
+            </div>
+            <div className="cart-summary-row">
+              <h4>Estimated Taxes:</h4>
+              <span>$0.00 **</span>
+            </div>
+            <div className="cart-summary-row">
+              <h4>Estimated Order Total:</h4>
+              <span>${this.state.totalAmt}</span>
             </div>
             <div>
-              Shipping & Handling: $0.00
+              <h4>** Actual sales tax will be calculated at time of shipment</h4>
             </div>
-            <div>
-              Estimated Taxes: $0.00 **
-            </div>
-            <div>
-              Estimated Order Total: ${this.state.totalAmt}
-            </div>
-            <div>
-              ** Actual sales tax will be calculated at time of shipment
-            </div>
-            <button>Checkout</button>
+            <button onClick={this.handleCheckoutClick}>Checkout</button>
           </div>
         </div>
       </div>
