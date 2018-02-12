@@ -9,6 +9,7 @@ import ProductsList from './components/productsListPage.jsx';
 import ProductCard from './components/productCard.jsx';
 import ProductDetail from './components/productDetailPage.jsx';
 import CheckOut from './components/checkOut.jsx';
+import RegisterUserForm from './components/registerUserForm.jsx';
 
 var axios = require('axios');
 
@@ -27,6 +28,8 @@ class Hello extends React.Component {
     this.changeView = this.changeView.bind(this);
     this.submitQuery = this.submitQuery.bind(this);
     this.addItemToCart = this.addItemToCart.bind(this);
+    this.registerUser = this.registerUser.bind(this);
+
   }
 
   changeView(view, item, invoice){
@@ -81,6 +84,10 @@ class Hello extends React.Component {
     return;
   }
 
+  registerUser(user) {
+    console.log('in registerUser in index', user)
+  }
+
   renderView() {
     let view = this.state.view;
     if (view === 'homePage') {
@@ -104,7 +111,11 @@ class Hello extends React.Component {
         addItemToCart={this.addItemToCart}
         />
     } else if (view === 'checkOut'){
-        return <CheckOut />
+      return <CheckOut />
+    } else if (view === 'registerUserForm'){
+      return <RegisterUserForm
+        registerUser={this.registerUser}
+        />
     } else {
       return null;
     }
