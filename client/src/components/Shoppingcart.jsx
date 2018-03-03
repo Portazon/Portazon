@@ -17,6 +17,7 @@ class ShoppingCart extends React.Component {
 
   componentWillMount(){
     this.getTotals();
+    //hi vitor!!
   }
 
 
