@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDom from 'react-dom';
+import {Link} from 'react-router-dom';
 import { Panel, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
 
 class CheckOut extends React.Component {
@@ -18,10 +19,13 @@ class CheckOut extends React.Component {
       bAptNo: '',
       bCity: '',
       bState: '',
-      bZip:''
+      bZip:'',
+      showPayment: false
+
     }
     this.handleSubmit = this.handleSubmit.bind(this);
     // this.handleChange = this.handleChange.bind(this);
+    this.renderPaymentButton = this.renderPaymentButton.bind(this);
   }
 
   handleUserInput(e){
@@ -33,6 +37,7 @@ class CheckOut extends React.Component {
   handleSubmit() {
     if (this.props.user.id) {
       this.props.submitInvoice();
+      this.setState({showPayment: true})
       // this.props.changeView('homePage');
     } else {
       let address = this.state.street + ' ' + this.state.aptNo + ', ' + this.state.city + ', ' + this.state.state + ' ' + this.state.zip;
@@ -44,7 +49,6 @@ class CheckOut extends React.Component {
       }
       console.log('in submit invoice', info)
       this.props.submitInvoice(info);
-      // this.props.changeView('homePage');
     }
   }
 
@@ -217,7 +221,17 @@ class CheckOut extends React.Component {
     )
   }
 
-
+renderPaymentButton() {
+  if (this.state.showPayment || this.props.showPayment) {
+      let url = 'http://portazon-payments-web-lb-1163595546.us-east-1.elb.amazonaws.com/?orderID=' + this.props.transactionID + '&paymentAmount=' + this.props.charged;
+      return (
+        <button className="submit-user-shipping">
+          <a href={url}>Go on to payment info!</a>
+        </button>)
+  } else {
+    return null;
+  }
+}
 
 render() {
     var aptNo = '';
@@ -225,6 +239,8 @@ render() {
       if (this.props.user.num !== 'undefined') {
         aptNo = this.props.user.num;
       }
+      let url = 'http://portazon-payments-web-lb-1163595546.us-east-1.elb.amazonaws.com/?orderID=' + this.props.transactionID + '&paymentAmount=' + this.props.charged;
+
       return(
         <div className="container-fluid col-sm-12">
           <div>
@@ -239,6 +255,7 @@ render() {
               </Panel.Body>
             <button type="button" className="submit-user-shipping" onClick={() => this.handleSubmit()}>Use this address</button>
             </Panel>
+            {this.renderPaymentButton()}
           </div>
           <div>
             <Panel id="collapsible-panel">
@@ -249,12 +266,15 @@ render() {
                 <Panel.Body>
                   {this.generateShippingForm()}
                 </Panel.Body>
+                {this.renderPaymentButton()}
               </Panel.Collapse>
             </Panel>
           </div>
+
         </div>
       )
     } else {
+
       return (
         <div className="col-sm-12">
           <div className="col-sm-1">
@@ -268,6 +288,8 @@ render() {
                 {this.generateShippingForm()}
               </Panel.Body>
             </Panel>
+            <div className="col-md-10">{this.renderPaymentButton()}
+            </div>
           </div>
           <div className="col-sm-1">
           </div>
