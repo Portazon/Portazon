@@ -37,10 +37,12 @@ class App extends React.Component {
       badge: 0,
       token: '',
       guestNum:'',
+      transactionID: '',
       showAddAlert: false,
       showRemoveAlert: false,
       showAddInvoiceAlert: false,
-      showIncorrectLogin: false
+      showIncorrectLogin: false,
+      showPayment: false
 
     }
     this.changeView = this.changeView.bind(this);
@@ -58,7 +60,8 @@ class App extends React.Component {
     this.createGuestUser = this.createGuestUser.bind(this);
     this.getInvoices = this.getInvoices.bind(this);
     // this.setParentState = this.setParentState.bind(this);
-    this.clearUserCart - this.clearUserCart.bind(this);
+    this.clearUserCart = this.clearUserCart.bind(this);
+    this.submitPayment = this.submitPayment.bind(this);
   }
 
 
@@ -330,8 +333,10 @@ class App extends React.Component {
       let token = window.localStorage.getItem('token');
       axios.post('users/updateInvoices', invoice, {headers: {'x-access-token': token}})
         .then(response => {
+
           this.getInvoices('showAddInvoiceAlert');
           this.clearUserCart();
+          this.setState({transactionID: response.data.transactionID, charged: response.data.charged})
 
         })
         .catch(err => console.log('err adding invoice', err))
@@ -342,20 +347,38 @@ class App extends React.Component {
       invoice.email = guest.email;
       axios.post('users/guestUpdateInvoices', invoice)
         .then(response => {
-          this.setState({showAddInvoiceAlert: true});
+          console.log('response submitting invoice', response.data.transactionID)
+          //this.setState({showAddInvoiceAlert: true});
+          let tId = response.data.transactionID;
+          let tAmt = response.data.charged;
+          //this.submitPayment(tId, tAmt);
+          this.setState({transactionID: tId, totalAmt: tAmt, showPayment: true})
         })
         .catch(err => console.log('err submitting guest invoice'))
     }
   }
 
-  clearUserCart() {
-    let token = window.localStorage.getItem('token');
-    let obj = {clearCart: true, userID: this.state.user.id, email: this.state.user.email}
-    axios.post('users/updateCart', obj, {headers: {'x-access-token': token}})
+  submitPayment(transactionID, charged) {
+    axios.get('http://portazon-payments-web-lb-1163595546.us-east-1.elb.amazonaws.com/?orderID=' + transactionID + '&paymentAmount=' + charged)
     .then(response => {
-      this.getCartByUser();
+      console.log('response submitting payment', response);
+      //this.setState({showAddInvoiceAlert: true})
     })
-    .catch(err => {console.log('err clearing cart', err)})
+    .catch(err => {console.log('err submitting payment', err)})
+  }
+
+  clearUserCart() {
+    if (this.state.user.id) {
+      let token = window.localStorage.getItem('token');
+      let obj = {clearCart: true, userID: this.state.user.id, email: this.state.user.email}
+      axios.post('users/updateCart', obj, {headers: {'x-access-token': token}})
+      .then(response => {
+        this.getCartByUser();
+      })
+      .catch(err => {console.log('err clearing cart', err)})
+    } else {
+      this.state.user.cart = [];
+    }
   }
 
 
@@ -448,7 +471,7 @@ class App extends React.Component {
             render={() => <ShoppingCart cart={this.state.cart} changeView={this.changeView} getCart={this.getCartByUser} removeItemFromCart={this.removeItemFromCart} changeQuantity={this.changeQuantity}/>  }>
           </Route>
           <Route exact path='/checkout'
-            render={() => <CheckOut user={this.state.user} submitInvoice={this.submitInvoice} changeView={this.changeView}/>  }>
+            render={() => <CheckOut user={this.state.user} submitInvoice={this.submitInvoice} changeView={this.changeView} showPayment={this.state.showPayment}/>  }>
           </Route>
           <Route exact path='/register_user'
             render={() => <RegisterUserForm registerUser={this.registerUser}/>  }>
